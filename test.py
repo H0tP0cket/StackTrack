@@ -2,6 +2,9 @@ import discord
 from discord.ext import commands
 import requests
 from collections import defaultdict
+import os
+
+TOKEN = os.getenv('DISCORD_TOKEN')
 
 
 intents = discord.Intents.default()  
@@ -109,4 +112,4 @@ async def ledger(ctx, game_url: str):
         await ctx.send("Failed to fetch game data.")
 
 
-bot.run('MTI5Mjc2NTU1MDI1ODI5MDcwOA.G0qcYf.z0YhAxLQsDwbCV71A8vhEXYp3d__HRzSfSuIGc')
+bot.run(TOKEN)
