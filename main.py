@@ -25,7 +25,7 @@ def fetch_data(url):
     except requests.RequestException as e:
         return f"Error fetching data: {e}"
 
-# Calculate payouts based on the player data
+
 def calculate_payouts(data):
     playerNet = defaultdict(int)
 
@@ -107,7 +107,8 @@ async def ledger(ctx, game_url: str):
             
             for negPlay, amount in negPlays.items():
                 negPlayNickname = player_map.get(negPlay, "unknown")
-                result.append(f"{negPlayNickname}: {amount}")  
+                new_amount = (amount // 50) * 50
+                result.append(f"{negPlayNickname}: {new_amount}")  
             
             result.append("")  
 
