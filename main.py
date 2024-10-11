@@ -41,35 +41,47 @@ def calculate_payouts(data):
             playerID = 'aarav_combined'
                 
         playerNet[playerID] += net  
+
+    return optimize_payouts(playerNet)
+
+
+def optimize_payouts(playerNet):
     
-    posPlays = {}
-    negPlays = {}
+    creditors = [(player, net) for player, net in playerNet.items() if net > 0]
+    debtors = [(player, net) for player, net in playerNet.items() if net < 0]
     
-    for player, net in playerNet.items():
-        if net > 0:
-            posPlays[player] = net
-        elif net < 0:
-            negPlays[player] = net
+   
+    creditors.sort(key=lambda x: x[1], reverse=True)
+    debtors.sort(key=lambda x: x[1])
     
     payouts = {}
-    for posPlay, positive_net in posPlays.items():
-        payouts[posPlay] = {}
-        remaining_net = positive_net
-        for negPlay, negative_net in sorted(negPlays.items(), key=lambda x: x[1]):
-            if remaining_net == 0:
-                break
-            if abs(negative_net) >= remaining_net:
-                payouts[posPlay][negPlay] = remaining_net
-                negPlays[negPlay] += remaining_net
-                remaining_net = 0
-            else:
-                payouts[posPlay][negPlay] = abs(negative_net)
-                remaining_net -= abs(negative_net)
-                negPlays[negPlay] += abs(negative_net)
-        negPlays = {k: v for k, v in negPlays.items() if v < 0}
+    
+    
+    while creditors and debtors:
+        creditor, credit = creditors.pop(0) 
+        debtor, debt = debtors.pop(0)       
+        
+       
+        transaction_amount = min(credit, -debt)
+        
+  
+        if creditor not in payouts:
+            payouts[creditor] = {}
+        payouts[creditor][debtor] = transaction_amount
+        
+      
+        credit -= transaction_amount
+        debt += transaction_amount
+        
+       
+        if credit > 0:
+            creditors.insert(0, (creditor, credit))
+        
+        
+        if debt < 0:
+            debtors.insert(0, (debtor, debt))
     
     return payouts
-
 
 def get_player_nicknames(data):
     player_map = {}
@@ -107,11 +119,12 @@ async def ledger(ctx, game_url: str):
             
             for negPlay, amount in negPlays.items():
                 negPlayNickname = player_map.get(negPlay, "unknown")
-                new_amount = (amount // 50) * 50
-                result.append(f"{negPlayNickname}: {new_amount}")  
+                
+                new_amount = ((amount // 50) * 50)/100
+                result.append(f"{negPlayNickname}: ${new_amount}0")  
+            result.append("")
             
-            result.append("")  
-
+                
         await ctx.send("\n".join(result))
     else:
         await ctx.send("Failed to fetch game data.")
