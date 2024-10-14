@@ -17,9 +17,9 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 
-def fetch_data(url):
+def fetch_data(url, headers=None):
     try:
-        response = requests.get(url)
+        response = requests.get(url, headers=headers)
         response.raise_for_status() 
         return response.json()
     except requests.RequestException as e:
@@ -105,7 +105,15 @@ def get_player_nicknames(data):
 async def ledger(ctx, game_url: str):
     poker_now_url = f"{game_url.rstrip('/')}/players_sessions"
 
-    data = fetch_data(poker_now_url)
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+        "Accept": "application/json",
+        
+        
+    }
+
+    data = fetch_data(poker_now_url, headers=headers)
 
     if data:
         payouts = calculate_payouts(data)
