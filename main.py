@@ -12,7 +12,9 @@ print(f"TOKEN: {TOKEN}")
 
 
 intents = discord.Intents.default()  
-intents.message_content = True       
+intents.message_content = True    
+
+intents.members = True   
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -50,34 +52,26 @@ def optimize_payouts(playerNet):
     creditors = [(player, net) for player, net in playerNet.items() if net > 0]
     debtors = [(player, net) for player, net in playerNet.items() if net < 0]
     
-   
     creditors.sort(key=lambda x: x[1], reverse=True)
     debtors.sort(key=lambda x: x[1])
     
     payouts = {}
     
-    
     while creditors and debtors:
         creditor, credit = creditors.pop(0) 
         debtor, debt = debtors.pop(0)       
         
-       
         transaction_amount = min(credit, -debt)
-        
-  
+   
         if creditor not in payouts:
             payouts[creditor] = {}
         payouts[creditor][debtor] = transaction_amount
-        
-      
+
         credit -= transaction_amount
         debt += transaction_amount
-        
-       
+
         if credit > 0:
             creditors.insert(0, (creditor, credit))
-        
-        
         if debt < 0:
             debtors.insert(0, (debtor, debt))
     
@@ -118,24 +112,31 @@ async def ledger(ctx, game_url: str):
     if data:
         payouts = calculate_payouts(data)
         player_map = get_player_nicknames(data)
+        members = {member.display_name.lower(): member for member in ctx.guild.members}
         
         result = []
         
         for posPlay, negPlays in payouts.items():
             posPlayNickname = player_map.get(posPlay, "unknown")
-            result.append(f"**{posPlayNickname}** gets paid by:") 
+            posPlayMention = members.get(posPlayNickname.lower(), posPlayNickname)
             
+            if isinstance(posPlayMention, discord.Member):
+                posPlayMention = posPlayMention.mention
+            result.append(f"**{posPlayMention}** gets paid by:") 
             for negPlay, amount in negPlays.items():
                 negPlayNickname = player_map.get(negPlay, "unknown")
+                negPlayMention = members.get(negPlayNickname.lower(), negPlayNickname)
+                if isinstance(negPlayMention, discord.Member):
+                    negPlayMention = negPlayMention.mention
+                
                 
                 new_amount = ((amount // 50) * 50)/100
-                result.append(f"{negPlayNickname}: ${new_amount}0")  
+                result.append(f"{negPlayMention}: ${new_amount}0")  
             result.append("")
             
                 
         await ctx.send("\n".join(result))
     else:
         await ctx.send("Failed to fetch game data.")
-
 
 bot.run(TOKEN)
