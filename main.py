@@ -10,10 +10,8 @@ load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 print(f"TOKEN: {TOKEN}")
 
-
 intents = discord.Intents.default()  
 intents.message_content = True    
-
 intents.members = True   
 
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -102,9 +100,7 @@ async def ledger(ctx, game_url: str):
     
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
-        "Accept": "application/json",
-        
-        
+        "Accept": "application/json",        
     }
 
     data = fetch_data(poker_now_url, headers=headers)
