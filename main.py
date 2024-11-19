@@ -127,7 +127,9 @@ async def ledger(ctx, game_url: str):
                 
                 
                 new_amount = ((amount // 50) * 50)/100
-                result.append(f"{negPlayMention}: ${new_amount}0")  
+                if new_amount > 0:
+                    result.append(f"{negPlayMention}: ${new_amount}0") 
+                
             result.append("")
             
                 

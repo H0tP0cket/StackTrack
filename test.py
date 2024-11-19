@@ -64,9 +64,9 @@ def main():
         posPlayNickname = player_map.get(posPlay, "unknown")
         print(f"{posPlayNickname} gets paid by:")
         for negPlay, amount in negPlays.items():
-            new_amount = ((amount // 50) * 50) / 100
+            # new_amount = ((amount // 50) * 50) / 100
             negPlayNickname = player_map.get(negPlay, "unknown")
-            print(f"  {negPlayNickname}: ${new_amount}0")
+            print(f"  {negPlayNickname}: ${amount}")
 
 if __name__ == "__main__":
     main()
